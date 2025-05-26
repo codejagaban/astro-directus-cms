@@ -1,0 +1,27 @@
+---
+import Hero from "./Hero.astro";
+import RichText from "./RichText.astro";
+import Pricing from "./Pricing.astro";
+import Form from "./Form.astro";
+import Gallery from "./Gallery.astro";
+
+const { blocks } = Astro.props;
+---
+
+{
+  blocks.map((block: any) => {
+    const View =
+      block.collection === "block_hero"
+        ? Hero
+        : block.collection === "block_richtext"
+          ? RichText
+          : block.collection === "block_pricing"
+            ? Pricing
+            : block.collection === "block_form"
+              ? Form
+              : block.collection === "block_gallery"
+                ? Gallery
+                : () => null;
+    return View && <View {...block} />;
+  })
+}

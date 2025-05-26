@@ -1,0 +1,188 @@
+---
+import { getNavigation } from "../lib/directus";
+
+
+const { seo } = Astro.props;
+const { title, description } = seo || { title: "Default Title", description: "Default Description" };
+
+const navigation = await getNavigation();
+const { data, error } = navigation;
+
+if (error) {
+  console.error("Error fetching navigation:", error);
+}
+
+const mainNav = data?.find((item) => item.id === "main");
+const mainNavItems = mainNav?.items ?? [];
+
+const footerNav = data?.find((item) => item.id === "footer");
+const footerNavItems = footerNav?.items ?? [];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        {mainNavItems.map((navItem) => (
+          <li >
+            {navItem.type === "page" && navItem.page ? (
+              <a href={navItem.page.permalink}>{navItem.title}</a>
+            ) : navItem.type === "group" && (navItem.children ?? []).length > 0 ? (
+              <div class="dropdown">
+                <span class="dropdown-title">{navItem.title}</span>
+                <ul class="dropdown-menu">
+                  {navItem.children?.map((child) => (
+                    <li >
+                      {child.type === "page" && child.page ? (
+                        <a href={child.page.permalink}>{child.title}</a>
+                      ) : child.type === "url" && child.url ? (
+                        <a href={child.url}>{child.title}</a>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : navItem.type === "url" && navItem.url ? (
+              <a href={navItem.url}>{navItem.title}</a>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <slot />
+
+    <footer>
+      <ul>
+        {footerNavItems.map((navItem) => (
+          <li>
+            {navItem.type === "page" && navItem.page ? (
+              <a href={navItem.page.permalink}>{navItem.title}</a>
+            ) : navItem.type === "url" && navItem.url ? (
+              <a href={navItem.url}>{navItem.title}</a>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </footer>
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  nav {
+    background-color: #f8f9fa;
+    padding: 1rem;
+  }
+
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+  }
+
+  nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  nav a:hover {
+    color: #666;
+  }
+
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown-title {
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+    transition: color 0.3s ease;
+  }
+
+  .dropdown-title:hover {
+    color: #666;
+  }
+
+  .dropdown ul.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+    width: 200px;
+    border-radius: 4px;
+    z-index: 1000; 
+  }
+
+  .dropdown:hover .dropdown-menu {
+    display: block; 
+  }
+
+  .dropdown-menu li {
+    padding: 0.5rem 1rem;
+  }
+
+  .dropdown-menu li a {
+    color: #333;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+  }
+
+  .dropdown-menu li a:hover {
+    color: #007bff;
+  }
+
+  footer {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  footer a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  footer a:hover {
+    color: #007bff;
+  }
+</style>

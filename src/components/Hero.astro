@@ -1,0 +1,177 @@
+---
+import { Image } from "astro:assets";
+
+interface HeroProps {
+  id: string;
+  sort: number;
+  collection: string;
+  hide_block: boolean;
+  background: string;
+  item: {
+    headline: string;
+    id: string;
+    description: string;
+    tagline: string;
+    layout: "image_right" | "image_left" | "image_center" | null;
+    image?: {
+      id: string;
+      storage: string;
+      filename_disk: string;
+      width: number;
+      height: number;
+      title: string;
+    };
+    button_group?: {
+      id: string;
+      sort: number | null;
+      buttons: Array<{
+        id: string;
+        label: string;
+        url?: string;
+        variant: string;
+        page?: {
+          permalink: string;
+        };
+        post?: {
+          slug: string;
+        };
+      }>;
+    };
+  };
+}
+
+const { background, item: { headline, description, tagline, layout, image, button_group } } = Astro.props as HeroProps;
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL;
+---
+
+<section class={`hero ${background} ${layout}`}>
+  <div class="hero-content">
+    <span class="tagline">{tagline}</span>
+    <h1>{headline}</h1>
+    <p>{description}</p>
+    {button_group?.buttons && (
+      <div class="button-group">
+        {button_group.buttons.map((button) => (
+          <a
+            href={button.url || button.page?.permalink || button.post?.slug || "#"}
+            target={button.url ? "_blank" : "_self"}
+            class="button"
+          >
+            {button.label}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+  {image && (
+    <div class="hero-image-container">
+      <Image
+        src={`${DIRECTUS_URL}/assets/${image.filename_disk}`}
+        alt={image.title}
+        width={image.width}
+        height={image.height}
+        class="hero-image"
+      />
+    </div>
+  )}
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 2rem;
+    background-color: #ffffff;
+  }
+
+  .hero.dark {
+    background-color: #333333;
+    color: #ffffff; 
+  }
+
+  .hero.image_center {
+    flex-direction: column;
+  }
+
+  .hero.image_left {
+    flex-direction: row-reverse;
+  }
+
+  .hero.image_right {
+    flex-direction: row;
+  }
+
+  .hero-content {
+    max-width: 600px;
+    text-align: center;
+  }
+
+  .hero.image_left .hero-content,
+  .hero.image_right .hero-content {
+    text-align: left;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #333333;
+  }
+
+  p {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: #555555;
+  }
+
+  .tagline {
+    font-size: 1rem;
+    font-style: italic;
+    color: #888888; 
+    margin-bottom: 2rem;
+  }
+
+  .hero-image-container {
+    flex-shrink: 0;
+    max-width: 100%;
+  }
+
+  .hero-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .hero.image_center .button-group {
+    justify-content: center;
+  }
+
+  .button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #ffffff;
+    background-color: #007bff;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+
+  .button:hover {
+    background-color: #0056b3; 
+  }
+
+  .button:active {
+    background-color: #003f7f; 
+  }
+</style>
