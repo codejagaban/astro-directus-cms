@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { getPageData } from "../lib/directus";
-import BlocksToComponents from "../components/BlocksToComponents.astro";
+import BlocksToComponents from "../components/BlocksToComponents.tsx";
 
 const { data, error } = await getPageData("/");
 
@@ -12,5 +12,5 @@ if (error) {
 ---
 
 <Layout seo={data?.seo}>
-   <BlocksToComponents blocks={data?.blocks} />
+  <BlocksToComponents blocks={data?.blocks} client:load />
 </Layout>

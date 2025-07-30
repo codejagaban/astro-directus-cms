@@ -84,4 +84,5 @@ export async function getNavigation(): Promise<NavigationData> {
   }
 }
 
+
 export default client;

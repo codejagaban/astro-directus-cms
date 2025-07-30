@@ -1,5 +1,5 @@
----
-import Hero from "./Hero.astro";
+<!-- ---
+import Hero from "./Hero.tsx";
 import RichText from "./RichText.astro";
 import Pricing from "./Pricing.astro";
 import Form from "./Form.astro";
@@ -10,18 +10,17 @@ const { blocks } = Astro.props;
 
 {
   blocks.map((block: any) => {
-    const View =
-      block.collection === "block_hero"
-        ? Hero
-        : block.collection === "block_richtext"
-          ? RichText
-          : block.collection === "block_pricing"
-            ? Pricing
-            : block.collection === "block_form"
-              ? Form
-              : block.collection === "block_gallery"
-                ? Gallery
-                : () => null;
-    return View && <View {...block} />;
+    if (block.collection === "block_hero") {
+      return <Hero {...block} client:idle />;
+    } else if (block.collection === "block_richtext") {
+      return <RichText {...block} />;
+    } else if (block.collection === "block_pricing") {
+      return <Pricing {...block} />;
+    } else if (block.collection === "block_form") {
+      return <Form {...block} />;
+    } else if (block.collection === "block_gallery") {
+      return <Gallery {...block} />;
+    }
+    return null;
   })
-}
+} -->
